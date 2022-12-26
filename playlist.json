@@ -1,0 +1,44 @@
+{
+    "playlists" : {
+      "href" : "https://api.spotify.com/v1/search?query=pop+mix&type=playlist&offset=0&limit=1",
+      "items" : [ {
+        "collaborative" : false,
+        "description" : "<a href=spotify:playlist:37i9dQZF1EIUYBhR3PuloN>Avril Lavigne</a>, <a href=spotify:playlist:37i9dQZF1EIZjqd8fFrYpm>vaultboy</a>, <a href=spotify:playlist:37i9dQZF1EIXcLuTwvXKFz>Natasha Bedingfield</a> and more",
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/playlist/37i9dQZF1EQncLwOalG3K7"
+        },
+        "href" : "https://api.spotify.com/v1/playlists/37i9dQZF1EQncLwOalG3K7",
+        "id" : "37i9dQZF1EQncLwOalG3K7",
+        "images" : [ {
+          "height" : null,
+          "url" : "https://seed-mix-image.spotifycdn.com/v6/img/pop/0p4nmQO2msCgU4IF37Wi3j/en/large",
+          "width" : null
+        } ],
+        "name" : "Pop Mix",
+        "owner" : {
+          "display_name" : "Spotify",
+          "external_urls" : {
+            "spotify" : "https://open.spotify.com/user/spotify"
+          },
+          "href" : "https://api.spotify.com/v1/users/spotify",
+          "id" : "spotify",
+          "type" : "user",
+          "uri" : "spotify:user:spotify"
+        },
+        "primary_color" : null,
+        "public" : null,
+        "snapshot_id" : "MTY3MTg2MTYwMCwwMDAwMDAwMGRkMGVmMjQ2NTc4MDQ1MGE5OWQwOTAyOTQ3YjdhYWE4",
+        "tracks" : {
+          "href" : "https://api.spotify.com/v1/playlists/37i9dQZF1EQncLwOalG3K7/tracks",
+          "total" : 50
+        },
+        "type" : "playlist",
+        "uri" : "spotify:playlist:37i9dQZF1EQncLwOalG3K7"
+      } ],
+      "limit" : 1,
+      "next" : "https://api.spotify.com/v1/search?query=pop+mix&type=playlist&offset=1&limit=1",
+      "offset" : 0,
+      "previous" : null,
+      "total" : 10001
+    }
+  }
