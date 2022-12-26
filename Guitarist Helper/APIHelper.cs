@@ -12,7 +12,10 @@ namespace Guitarist_Helper
 {
     internal class APIHelper
     {
-        private string authToken = "BQDHiBnAokNiTK8r7pzl-5ETo42haV0kwI_mNXcRixZrjvwJJSDc3WqMe_4x6rWHY0gZwHp4USIlPGM7ELu6ivRfep9K8hbp7vMlRTesEXfHRlrT1nIvxB39sHkEKgM8cDVcCCB5wgwhIXZz2h3pul5BY1IL6CRdwaQigQfWA_7cE_YV";
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+#pragma warning disable CS8604 // Possible null reference argument.
+
+        private string authToken = "BQD7XIYyLaVgKmNLlOhR_LL1B8Lhu_rxPji8TSOw4ySqrgHsFEGw1Z9i_YGYGZfX6EQkpXKLXxhUL9umm_Lij4eM5fo5tK0HJMQE15uxw9JqwPVjHwOUmf0aizku0j74YONt1Des-bQNry1yqL-fdlD3cl3PdVJUjGZ0SsrFJ-VNZiZ2";
         public HttpClient Client = new HttpClient();
 
         public APIHelper()
@@ -20,20 +23,24 @@ namespace Guitarist_Helper
             Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
         }
 
-        public async Task<string> getPlaylistId(string playlist)
+        public async Task<string> getPlaylistId(string playlistID)
         {
-            var response = await Client.GetAsync("https://api.spotify.com/v1/search" + "?q=" + playlist.Trim() + "&type=playlist&limit=1");
-            response.EnsureSuccessStatusCode();
-            var json = JsonSerializer.Deserialize<JsonPlaylist>(response.Content.ReadAsStream(), new JsonSerializerOptions());
-            return json.playlists.items.First().external_urls.spotify.Split("/").Last();
+            HttpResponseMessage response = await Client.GetAsync("https://api.spotify.com/v1/search" + "?q=" + playlistID.Trim() + "&type=playlist&limit=1");
+            JsonPlaylist playlist = JsonSerializer.Deserialize<JsonPlaylist>(response.Content.ReadAsStream(), new JsonSerializerOptions());
+            return playlist.playlists.items.First().external_urls.spotify.Split("/").Last();
         }
 
         public async Task<List<String>> getTracks(string playlistID)
         {
-            var response = await Client.GetAsync("https://api.spotify.com/v1/playlists/" + playlistID);
-            response.EnsureSuccessStatusCode();
-            var json = JsonSerializer.Deserialize<JsonTracks>(response.Content.ReadAsStream(), new JsonSerializerOptions());
-            return null;
+            List<string> result = new List<string>();
+            HttpResponseMessage response = await Client.GetAsync("https://api.spotify.com/v1/playlists/" + playlistID);
+            JsonTracks tracks = JsonSerializer.Deserialize<JsonTracks>(response.Content.ReadAsStream(), new JsonSerializerOptions());
+            foreach (Item item in tracks.tracks.items)
+            {
+                string line = item.track.artists.First().name + " - " + item.track.name;
+                result.Add(line);
+            }
+            return result;
         }
 
 

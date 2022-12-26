@@ -19,14 +19,14 @@ namespace Guitarist_Helper
 
         public async Task<string> GetLinks()
         {
-            var tracks = await GetTracks();
+            List<string> tracks = await GetTracks();
 
             return ""; //Final result
         }
 
         private async Task<List<String>> GetTracks()
         {
-            var playlistID = await apiHelper.getPlaylistId(Genre);
+            string playlistID = await apiHelper.getPlaylistId(Genre);
             return await apiHelper.getTracks(playlistID);
         }
     }

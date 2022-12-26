@@ -27,8 +27,14 @@ namespace Guitarist_Helper
 
     public class Track
     {
+        public List<Artist>? artists { get; set; }
         public ExternalUrls? external_urls { get; set; }
         public string? name { get; set; }
         public string? preview_url { get; set; }
+    }
+
+    public class Artist
+    {
+        public string? name { get; set; }
     }
 }
