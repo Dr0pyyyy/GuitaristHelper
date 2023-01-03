@@ -5,6 +5,6 @@ if (genre != null)
 {
     SpotifyManager spotifyManager = new SpotifyManager(genre);
 
-    var result = await spotifyManager.GetLinks();
+    var result = await spotifyManager.GetList();
 }
 
