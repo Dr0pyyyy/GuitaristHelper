@@ -17,17 +17,18 @@ namespace Guitarist_Helper
 #pragma warning disable CS8603 // Possible null refence return.
 #pragma warning disable CS8604 // Possible null reference argument.
 
-        private string authToken = "BQAbHUidghMwvQ_f-2rXXmmkWJRWgW3aCFJkKNU9w8pdRuwCzA-Vl8XmqYSnwZ7T_1VSpYQxCHBe3f4stexi2bZ8n-lGPJluk3OU-c0Mcu7kjHNFP21hoXvqX7YOWSPAF48mXcGLba0sYFIBYm4YQtFvdECOP-JxtQLn1wuqAlWjH8or";
+        private string authToken = "BQAGnvOdUpiQ0DpvR7QAgzA8FPXGqvvx8hfTOrOfENYTXCW3YL03X7q_3PW4Dv5VEeE_APXv6CpZfsNtRQKldaHzEubDGiFojBniXVNzVvlpFp8wulTNhJWPx_AFxUbZ0_SoNWuDR_5CNdafqV32tXAu6J7IownV5r27OkOhGrcSRDv9";
         public HttpClient Client = new HttpClient();
+        WebScraper webScraper = new WebScraper();
 
         public APIHelper()
         {
             Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
         }
 
-        public async Task<string> getPlaylistId(string playlistID)
+        public async Task<string> getPlaylistId(string genre)
         {
-            HttpResponseMessage response = await Client.GetAsync("https://api.spotify.com/v1/search" + "?q=" + playlistID.Trim() + "&type=playlist&limit=1");
+            HttpResponseMessage response = await Client.GetAsync("https://api.spotify.com/v1/search" + "?q=" + genre.Trim() + "&type=playlist&limit=1");
             response.EnsureSuccessStatusCode();
             JsonPlaylist playlist = JsonSerializer.Deserialize<JsonPlaylist>(response.Content.ReadAsStream(), new JsonSerializerOptions());
             return playlist.playlists.items.First().external_urls.spotify.Split("/").Last();
@@ -45,16 +46,8 @@ namespace Guitarist_Helper
         public async Task<string> getSongTabs(string songName, string artistName)
         {
             string requestedSong = artistName.Replace(" ", "%20") + "%20" + songName.Replace(" ", "%20");
-            HttpResponseMessage response = await Client.GetAsync("https://www.chords-and-tabs.net/songs/search/Ed%20sheeran%20Perfect");
-            return await response.Content.ReadAsStringAsync();
+            HttpResponseMessage response = await Client.GetAsync("https://www.chords-and-tabs.net/songs/search/" + requestedSong);
+            return webScraper.GetLink(await response.Content.ReadAsStringAsync());
         }
-
-        /*
-        private async Task<string> getOauthToken()
-        {
-            //Update when main function of the app will be complete
-            //Most likely in v2.0. that will be with frontend
-            return "";
-        }*/
     }
 }

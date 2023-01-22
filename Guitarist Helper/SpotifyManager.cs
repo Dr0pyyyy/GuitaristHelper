@@ -13,12 +13,13 @@ namespace Guitarist_Helper
 #pragma warning disable CS8604 // Possible null reference argument.
 
         private string Genre { get; set; }
-        private APIHelper apiHelper { get; set; }
+        private APIHelper ApiHelper { get; set; }
 
         public SpotifyManager(string genre)
         {
             this.Genre = genre;
-            apiHelper = new APIHelper();
+            this.ApiHelper = new APIHelper();
+
         }
 
         public async Task<string> GetList()
@@ -27,24 +28,33 @@ namespace Guitarist_Helper
 
             var links = await GetLinks(tracks); //Links for chords
 
+            //Tady udělat list kterej bude obsahovat jak nazvy songu a artisty, tak linky na dany songy
+
             return ""; //Final result
         }
 
         private async Task<List<String>> GetLinks(JsonTracks songs)
         {
+            List<string> links = new List<string>();
             foreach (var song in songs.tracks.items)
             {
-                string html = await apiHelper.getSongTabs(song.track.name, song.track.artists.First().name); //whole html
-                //Parse value here create frontend first
+                var link = await ApiHelper.getSongTabs(song.track.name, song.track.artists.First().name);
+                if (link != null)
+                {
+                    links.Add("https://www.chords-and-tabs.net" + link);
+                }
+                else
+                {
+                    links.Add("Sorry we couldnt find chords or tabs for this song!");
+                }
             }
-
-            return null;
+            return links;
         }
 
         private async Task<JsonTracks> GetTracks()
         {
-            string playlistID = await apiHelper.getPlaylistId(Genre);
-            return await apiHelper.getTracks(playlistID);
+            string playlistID = await ApiHelper.getPlaylistId(Genre);
+            return await ApiHelper.getTracks(playlistID);
         }
     }
 }
