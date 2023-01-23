@@ -1,9 +1,9 @@
 ﻿using Guitarist_Helper;
 
-string? genre = "pop mix";
-if (genre != null)
+string? nameOfPlaylist = "pop mix";
+if (nameOfPlaylist != null)
 {   
-    SpotifyManager spotifyManager = new SpotifyManager(genre);
+    SpotifyManager spotifyManager = new SpotifyManager(nameOfPlaylist);
 
     var result = await spotifyManager.GetList();
 }

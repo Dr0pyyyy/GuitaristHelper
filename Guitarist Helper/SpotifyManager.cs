@@ -12,49 +12,60 @@ namespace Guitarist_Helper
 #pragma warning disable CS8603 // Possible null refence return.
 #pragma warning disable CS8604 // Possible null reference argument.
 
-        private string Genre { get; set; }
+        private string nameOfPlaylist { get; set; }
         private APIHelper ApiHelper { get; set; }
 
-        public SpotifyManager(string genre)
+        public SpotifyManager(string nameOfPlaylist)
         {
-            this.Genre = genre;
+            this.nameOfPlaylist = nameOfPlaylist;
             this.ApiHelper = new APIHelper();
 
         }
 
-        public async Task<string> GetList()
+        public async Task<List<string>> GetList()
         {
-            JsonTracks tracks = await GetTracks(); //Tracks and artists
+            List<Tuple<string, string>> songs = await GetSongs();
 
-            var links = await GetLinks(tracks); //Links for chords
-
-            //Tady udělat list kterej bude obsahovat jak nazvy songu a artisty, tak linky na dany songy
-
-            return ""; //Final result
+            return GroupLists(songs, await GetLinks(songs));
         }
 
-        private async Task<List<String>> GetLinks(JsonTracks songs)
+        private List<string> GroupLists(List<Tuple<string,string>> songs, List<string> links)
+        {
+            List<string> result = new List<string>();
+            int i = 0;
+            foreach (var item in songs)
+            {
+                result.Add(item.Item1 + " - " + item.Item2);
+                result.Add(links[i]);
+                i++;
+            }
+            return result;
+        }
+
+        private async Task<List<String>> GetLinks(List<Tuple<string,string>> songs)
         {
             List<string> links = new List<string>();
-            foreach (var song in songs.tracks.items)
+            foreach (var song in songs)
             {
-                var link = await ApiHelper.getSongTabs(song.track.name, song.track.artists.First().name);
+                var link = await ApiHelper.GetSongLink(song.Item1, song.Item2);
                 if (link != null)
-                {
                     links.Add("https://www.chords-and-tabs.net" + link);
-                }
                 else
-                {
                     links.Add("Sorry we couldnt find chords or tabs for this song!");
-                }
             }
             return links;
         }
 
-        private async Task<JsonTracks> GetTracks()
+        private async Task<List<Tuple<string, string>>> GetSongs()
         {
-            string playlistID = await ApiHelper.getPlaylistId(Genre);
-            return await ApiHelper.getTracks(playlistID);
+            string playlistID = await ApiHelper.GetPlaylistId(nameOfPlaylist);
+            var jsontracks =  await ApiHelper.GetSongs(playlistID);
+            List<Tuple<string, string>> songs = new List<Tuple<string, string>>();
+            foreach (var track in jsontracks.tracks.items)
+            {
+                songs.Add(new Tuple<string, string>(track.track.name, track.track.artists.First().name));
+            }
+            return songs;
         }
     }
 }

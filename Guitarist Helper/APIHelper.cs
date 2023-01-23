@@ -17,7 +17,7 @@ namespace Guitarist_Helper
 #pragma warning disable CS8603 // Possible null refence return.
 #pragma warning disable CS8604 // Possible null reference argument.
 
-        private string authToken = "BQAGnvOdUpiQ0DpvR7QAgzA8FPXGqvvx8hfTOrOfENYTXCW3YL03X7q_3PW4Dv5VEeE_APXv6CpZfsNtRQKldaHzEubDGiFojBniXVNzVvlpFp8wulTNhJWPx_AFxUbZ0_SoNWuDR_5CNdafqV32tXAu6J7IownV5r27OkOhGrcSRDv9";
+        private string authToken = "BQAaDz0yENn9cUeCnZYuUseUaeQMclFM-MtivBz93jrdn4Rap1zsp7UyYOH6sqwSSHp8szMnfMQXy6NIHnzyHVXJqOO4XjevqG654SmU2_NAMH6WAvnjfCZ5LNBF6bNb4yTA6Q-xyNvrFYUMymREMQISv31DBNmuGYpZSOUUd1JIZmWw";
         public HttpClient Client = new HttpClient();
         WebScraper webScraper = new WebScraper();
 
@@ -26,15 +26,15 @@ namespace Guitarist_Helper
             Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
         }
 
-        public async Task<string> getPlaylistId(string genre)
+        public async Task<string> GetPlaylistId(string nameOfPlaylist)
         {
-            HttpResponseMessage response = await Client.GetAsync("https://api.spotify.com/v1/search" + "?q=" + genre.Trim() + "&type=playlist&limit=1");
+            HttpResponseMessage response = await Client.GetAsync("https://api.spotify.com/v1/search" + "?q=" + nameOfPlaylist.Trim() + "&type=playlist&limit=1");
             response.EnsureSuccessStatusCode();
             JsonPlaylist playlist = JsonSerializer.Deserialize<JsonPlaylist>(response.Content.ReadAsStream(), new JsonSerializerOptions());
             return playlist.playlists.items.First().external_urls.spotify.Split("/").Last();
         }
 
-        public async Task<JsonTracks> getTracks(string playlistID)
+        public async Task<JsonTracks> GetSongs(string playlistID)
         {
             List<string> result = new List<string>();
             HttpResponseMessage response = await Client.GetAsync("https://api.spotify.com/v1/playlists/" + playlistID);
@@ -43,10 +43,11 @@ namespace Guitarist_Helper
             return tracks;
         }
 
-        public async Task<string> getSongTabs(string songName, string artistName)
+        public async Task<string> GetSongLink(string songName, string artistName)
         {
             string requestedSong = artistName.Replace(" ", "%20") + "%20" + songName.Replace(" ", "%20");
             HttpResponseMessage response = await Client.GetAsync("https://www.chords-and-tabs.net/songs/search/" + requestedSong);
+            //Response contains whole html data of requested song and need to be scraped
             return webScraper.GetLink(await response.Content.ReadAsStringAsync());
         }
     }
