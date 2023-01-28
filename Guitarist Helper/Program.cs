@@ -1,5 +1,4 @@
 ﻿using Guitarist_Helper;
-
 string? nameOfPlaylist = "pop mix";
 if (nameOfPlaylist != null)
 {   

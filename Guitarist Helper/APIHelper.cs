@@ -17,13 +17,26 @@ namespace Guitarist_Helper
 #pragma warning disable CS8603 // Possible null refence return.
 #pragma warning disable CS8604 // Possible null reference argument.
 
-        private string authToken = "BQAaDz0yENn9cUeCnZYuUseUaeQMclFM-MtivBz93jrdn4Rap1zsp7UyYOH6sqwSSHp8szMnfMQXy6NIHnzyHVXJqOO4XjevqG654SmU2_NAMH6WAvnjfCZ5LNBF6bNb4yTA6Q-xyNvrFYUMymREMQISv31DBNmuGYpZSOUUd1JIZmWw";
+        private string authToken;
         public HttpClient Client = new HttpClient();
         WebScraper webScraper = new WebScraper();
 
         public APIHelper()
         {
+            authToken = "asdasd"; //až bude fungovat metoda GetAccessToken(), tak ji dosadit do authToken
+
             Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+        }
+
+        public async Task<string> GetAccessToken()
+        {//FIX
+            StringContent queryString = new StringContent("543981021bd348419b8abcb150449f5a:e9910fe8f8fb451db7ac823c343932ad");
+
+            HttpResponseMessage response = await Client.PostAsync("https://accounts.spotify.com/api/token", queryString);
+
+            var token = JsonSerializer.Deserialize<string>(response.Content.ReadAsStream());
+
+            return token;
         }
 
         public async Task<string> GetPlaylistId(string nameOfPlaylist)

@@ -9,7 +9,6 @@ namespace Guitarist_Helper
     internal class SpotifyManager
     {
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-#pragma warning disable CS8603 // Possible null refence return.
 #pragma warning disable CS8604 // Possible null reference argument.
 
         private string nameOfPlaylist { get; set; }
@@ -24,6 +23,9 @@ namespace Guitarist_Helper
 
         public async Task<List<string>> GetList()
         {
+            //Až bude GetAccessToken fungovat, tak to tady oddělat a použít ji jen pro API helper
+            var token = await ApiHelper.GetAccessToken();
+
             List<Tuple<string, string>> songs = await GetSongs();
 
             return GroupLists(songs, await GetLinks(songs));
