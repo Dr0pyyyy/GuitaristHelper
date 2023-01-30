@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Reflection.Metadata.Ecma335;
+using System.Net;
+using System.Net.Http;
 
 namespace Guitarist_Helper
 {
@@ -30,13 +32,21 @@ namespace Guitarist_Helper
 
         public async Task<string> GetAccessToken()
         {//FIX
-            StringContent queryString = new StringContent("543981021bd348419b8abcb150449f5a:e9910fe8f8fb451db7ac823c343932ad");
+            //Vytvořen specifický httpclient kvůli speciálnímu nastavení pro získání tokenu
+            HttpClient spotifyClient = new HttpClient();
 
-            HttpResponseMessage response = await Client.PostAsync("https://accounts.spotify.com/api/token", queryString);
+            byte[] clientByte = Encoding.UTF8.GetBytes("543981021bd348419b8abcb150449f5a:e9910fe8f8fb451db7ac823c343932ad");
+            var clientIdAndSecret = Convert.ToBase64String(clientByte);
 
-            var token = JsonSerializer.Deserialize<string>(response.Content.ReadAsStream());
+            spotifyClient.BaseAddress = new Uri("https://accounts.spotify.com/api/token");
+            spotifyClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            spotifyClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", clientIdAndSecret);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://accounts.spotify.com/api/token");
+            request.Content = new StringContent("application/x-www-form-urlencoded", Encoding.UTF8);
 
-            return token;
+            HttpResponseMessage a = await spotifyClient.SendAsync(request);
+
+            return "";
         }
 
         public async Task<string> GetPlaylistId(string nameOfPlaylist)
