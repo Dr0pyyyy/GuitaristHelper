@@ -15,8 +15,7 @@ namespace Guitarist_Helper
         public SpotifyManager(string playlistID)
         {
             //Getting pure ID without url
-            this.PLaylistID = playlistID.Split('/').Last();
-            this.PLaylistID = this.PLaylistID.Split('?').First();
+            this.PLaylistID = playlistID.Split('/').Last().Split('?').First();
             this.ApiHelper = new APIHelper();
         }
 
@@ -58,10 +57,7 @@ namespace Guitarist_Helper
         {
             var jsontracks = await ApiHelper.GetSongNames(PLaylistID);
             List<Tuple<string, string>> songs = new List<Tuple<string, string>>();
-            foreach (var track in jsontracks.tracks.items)
-            {
-                songs.Add(new Tuple<string, string>(track.track.name, track.track.artists.First().name));
-            }
+            jsontracks.tracks.items.ForEach(track => songs.Add(new Tuple<string, string>(track.track.name, track.track.artists.First().name)));
             return songs;
         }
     }

@@ -1,10 +1,15 @@
 ﻿using Guitarist_Helper;
 
-string? playlistID = "https://open.spotify.com/playlist/37i9dQZF1EQncLwOalG3K7?si=00d272231653457c";
+Console.Write("Insert playlist ID: ");
+string playlistID = Console.ReadLine();
+
 if (playlistID != null)
 {
     SpotifyManager spotifyManager = new SpotifyManager(playlistID);
-
-    var playlist = spotifyManager.GetList();
-    var a = playlist.Result;
+    var playlist = spotifyManager.GetList().Result;
 }
+
+Console.ReadKey();
+
+
+//MAIN TODO = Implement ILogger and log functions

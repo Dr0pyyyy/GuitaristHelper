@@ -33,7 +33,7 @@ namespace Guitarist_Helper
         {
             //Created instance of HttpClient, because it needs special settings to get access token
             HttpClient spotifyClient = new HttpClient();
-            byte[] clientByte = Encoding.UTF8.GetBytes("543981021bd348419b8abcb150449f5a:370eee3d84cc4323b91a56573a5dec66");
+            byte[] clientByte = Encoding.UTF8.GetBytes("e73883597a9346cab465adad28569272:13a30406eac44974b05b00547daa0149");
             var clientIdAndSecret = Convert.ToBase64String(clientByte);
             spotifyClient.BaseAddress = new Uri("https://accounts.spotify.com/api/token");
             spotifyClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", clientIdAndSecret);
