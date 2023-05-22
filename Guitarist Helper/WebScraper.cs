@@ -15,7 +15,6 @@ namespace Guitarist_Helper
             //Load html for html agility pack
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(html);
-
             try
             {
                 return htmlDoc.DocumentNode.SelectNodes("//ul/li/a").First().Attributes["href"].Value;

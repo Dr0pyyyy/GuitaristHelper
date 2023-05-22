@@ -17,16 +17,15 @@ namespace Guitarist_Helper
     {
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 #pragma warning disable CS8603 // Possible null refence return.
-#pragma warning disable CS8604 // Possible null reference argument.
 
-        private string authToken;
+        private string AuthToken;
         private HttpClient Client = new HttpClient();
-        private WebScraper webScraper = new WebScraper();
+        private WebScraper WebScraper = new WebScraper();
 
         public APIHelper()
         {
-            authToken = GetAccessToken().Result;
-            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+            AuthToken = GetAccessToken().Result;
+            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthToken);
             Task.Run(() => this.GetAccessToken()).Wait();
         }
 
@@ -34,7 +33,7 @@ namespace Guitarist_Helper
         {
             //Created instance of HttpClient, because it needs special settings to get access token
             HttpClient spotifyClient = new HttpClient();
-            byte[] clientByte = Encoding.UTF8.GetBytes("543981021bd348419b8abcb150449f5a:e9910fe8f8fb451db7ac823c343932ad");
+            byte[] clientByte = Encoding.UTF8.GetBytes("543981021bd348419b8abcb150449f5a:370eee3d84cc4323b91a56573a5dec66");
             var clientIdAndSecret = Convert.ToBase64String(clientByte);
             spotifyClient.BaseAddress = new Uri("https://accounts.spotify.com/api/token");
             spotifyClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", clientIdAndSecret);
@@ -48,21 +47,11 @@ namespace Guitarist_Helper
             return token.access_token;
         }
 
-        public async Task<string> GetPlaylistId(string nameOfPlaylist)
+        public async Task<Root> GetSongNames(string playlistID)
         {
-            HttpResponseMessage response = await Client.GetAsync("https://api.spotify.com/v1/search" + "?q=" + nameOfPlaylist.Trim() + "&type=playlist&limit=1");
-            response.EnsureSuccessStatusCode();
-            JsonPlaylist playlist = JsonSerializer.Deserialize<JsonPlaylist>(response.Content.ReadAsStream(), new JsonSerializerOptions());
-            return playlist.playlists.items.First().external_urls.spotify.Split("/").Last();
-        }
-
-        public async Task<JsonTracks> GetSongNames(string playlistID)
-        {
-            List<string> result = new List<string>();
             HttpResponseMessage response = await Client.GetAsync("https://api.spotify.com/v1/playlists/" + playlistID);
             response.EnsureSuccessStatusCode();
-            JsonTracks tracks = JsonSerializer.Deserialize<JsonTracks>(response.Content.ReadAsStream(), new JsonSerializerOptions());
-            return tracks;
+            return JsonSerializer.Deserialize<Root>(response.Content.ReadAsStream(), new JsonSerializerOptions());
         }
 
         public async Task<string> GetSongLink(string songName, string artistName)
@@ -71,7 +60,7 @@ namespace Guitarist_Helper
             HttpResponseMessage response = await Client.GetAsync("https://www.chords-and-tabs.net/songs/search/" + requestedSong);
             response.EnsureSuccessStatusCode();
             //Response contains whole html data of requested song and need to be scraped
-            return webScraper.GetLink(await response.Content.ReadAsStringAsync());
+            return WebScraper.GetLink(await response.Content.ReadAsStringAsync());
         }
     }
 }

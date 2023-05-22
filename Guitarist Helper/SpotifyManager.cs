@@ -9,15 +9,14 @@ namespace Guitarist_Helper
 {
     internal class SpotifyManager
     {
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-#pragma warning disable CS8604 // Possible null reference argument.
+        private string PLaylistID { get; set; }
+        private APIHelper ApiHelper { get; set; }
 
-        private string nameOfPlaylist { get; set; }
-        private APIHelper ApiHelper { get; set; }   
-
-        public SpotifyManager(string nameOfPlaylist)
+        public SpotifyManager(string playlistID)
         {
-            this.nameOfPlaylist = nameOfPlaylist;
+            //Getting pure ID without url
+            this.PLaylistID = playlistID.Split('/').Last();
+            this.PLaylistID = this.PLaylistID.Split('?').First();
             this.ApiHelper = new APIHelper();
         }
 
@@ -28,7 +27,7 @@ namespace Guitarist_Helper
             return GroupLists(songs, await GetSongLinks(songs));
         }
 
-        private List<string> GroupLists(List<Tuple<string,string>> songs, List<string> links)
+        private List<string> GroupLists(List<Tuple<string, string>> songs, List<string> links)
         {
             List<string> result = new List<string>();
             int i = 0;
@@ -41,7 +40,7 @@ namespace Guitarist_Helper
             return result;
         }
 
-        private async Task<List<String>> GetSongLinks(List<Tuple<string,string>> songs)
+        private async Task<List<String>> GetSongLinks(List<Tuple<string, string>> songs)
         {
             List<string> links = new List<string>();
             foreach (var song in songs)
@@ -57,8 +56,7 @@ namespace Guitarist_Helper
 
         private async Task<List<Tuple<string, string>>> GetSongNames()
         {
-            string playlistID = await ApiHelper.GetPlaylistId(nameOfPlaylist);
-            var jsontracks =  await ApiHelper.GetSongNames(playlistID);
+            var jsontracks = await ApiHelper.GetSongNames(PLaylistID);
             List<Tuple<string, string>> songs = new List<Tuple<string, string>>();
             foreach (var track in jsontracks.tracks.items)
             {
