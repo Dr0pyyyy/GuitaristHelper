@@ -24,14 +24,15 @@ namespace Guitarist_Helper
         private HttpClient Client = new HttpClient();
         private WebScraper WebScraper = new WebScraper();
 
-        private readonly ILogger<SpotifyManager> _logger;
-        private readonly IConfiguration _configuration;
+        private readonly IConfiguration _config;
 
-        public APIHelper()
+        public APIHelper(IConfiguration config)
         {
             AccessToken = GetAccessToken().Result;
             Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
             Task.Run(() => this.GetAccessToken()).Wait();
+
+            _config = config;
         }
 
         public async Task<Root> GetSongNames(string playlistID)

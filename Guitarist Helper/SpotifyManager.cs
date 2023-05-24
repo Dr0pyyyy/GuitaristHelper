@@ -20,7 +20,7 @@ namespace Guitarist_Helper
         public SpotifyManager(ILogger<SpotifyManager> logger, IConfiguration config)
         {
             //Getting ID without url
-            this.ApiHelper = new APIHelper();
+            this.ApiHelper = new APIHelper(config);
             this._logger = logger;
             this._configuration = config;
         }
