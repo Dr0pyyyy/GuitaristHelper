@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -7,26 +8,27 @@ using System.Threading.Tasks;
 
 namespace Guitarist_Helper
 {
-    internal class SpotifyManager
+    public class SpotifyManager:IMusicManager
     {
-        private string PLaylistID { get; set; }
-        private APIHelper ApiHelper { get; set; }
+        public APIHelper ApiHelper { get; set; }
 
-        public SpotifyManager(string playlistID)
+        private readonly ILogger<SpotifyManager> _logger;
+
+        public SpotifyManager(ILogger<SpotifyManager> logger)
         {
-            //Getting pure ID without url
-            this.PLaylistID = playlistID.Split('/').Last().Split('?').First();
+            //Getting ID without url
             this.ApiHelper = new APIHelper();
+            this._logger = logger;
         }
 
-        //TODO - GetList a GroupLists se musí přejmenovat
-        public async Task<List<string>> GetList()
+        public async Task<List<string>> GetPlaylist(string playlistID)
         {
-            List<Tuple<string, string>> songs = await GetSongNames();
-            return GroupLists(songs, await GetSongLinks(songs));
+            playlistID = playlistID.Split('/').Last().Split('?').First();
+            List<Tuple<string, string>> songs = await GetSongNames(playlistID);
+            return MergeLists(songs, await GetSongLinks(songs));
         }
 
-        private List<string> GroupLists(List<Tuple<string, string>> songs, List<string> links)
+        private List<string> MergeLists(List<Tuple<string, string>> songs, List<string> links)
         {
             List<string> result = new List<string>();
             int i = 0;
@@ -53,9 +55,9 @@ namespace Guitarist_Helper
             return links;
         }
 
-        private async Task<List<Tuple<string, string>>> GetSongNames()
+        private async Task<List<Tuple<string, string>>> GetSongNames(string playlistID)
         {
-            var jsontracks = await ApiHelper.GetSongNames(PLaylistID);
+            var jsontracks = await ApiHelper.GetSongNames(playlistID);
             List<Tuple<string, string>> songs = new List<Tuple<string, string>>();
             jsontracks.tracks.items.ForEach(track => songs.Add(new Tuple<string, string>(track.track.name, track.track.artists.First().name)));
             return songs;
