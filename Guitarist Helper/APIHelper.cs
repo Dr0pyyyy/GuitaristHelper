@@ -10,41 +10,28 @@ using System.Text.Json.Serialization;
 using System.Reflection.Metadata.Ecma335;
 using System.Net;
 using System.Net.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Guitarist_Helper
 {
-    internal class APIHelper
+    public class APIHelper
     {
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 #pragma warning disable CS8603 // Possible null refence return.
 
-        private string AuthToken;
+        private readonly string AccessToken;
         private HttpClient Client = new HttpClient();
         private WebScraper WebScraper = new WebScraper();
 
+        private readonly ILogger<SpotifyManager> _logger;
+        private readonly IConfiguration _configuration;
+
         public APIHelper()
         {
-            AuthToken = GetAccessToken().Result;
-            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthToken);
+            AccessToken = GetAccessToken().Result;
+            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
             Task.Run(() => this.GetAccessToken()).Wait();
-        }
-
-        public async Task<string> GetAccessToken()
-        {
-            //Created instance of HttpClient, because it needs special settings to get access token
-            HttpClient spotifyClient = new HttpClient();
-            byte[] clientByte = Encoding.UTF8.GetBytes("e73883597a9346cab465adad28569272:13a30406eac44974b05b00547daa0149");
-            var clientIdAndSecret = Convert.ToBase64String(clientByte);
-            spotifyClient.BaseAddress = new Uri("https://accounts.spotify.com/api/token");
-            spotifyClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", clientIdAndSecret);
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://accounts.spotify.com/api/token");
-            request.Content = new StringContent("grant_type=client_credentials", Encoding.Default, "application/x-www-form-urlencoded");
-
-            var response = await spotifyClient.PostAsync(spotifyClient.BaseAddress, request.Content);
-            response.EnsureSuccessStatusCode();
-
-            var token = JsonSerializer.Deserialize<AccessToken>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions());
-            return token.access_token;
         }
 
         public async Task<Root> GetSongNames(string playlistID)
@@ -61,6 +48,31 @@ namespace Guitarist_Helper
             response.EnsureSuccessStatusCode();
             //Response contains whole html data of requested song and need to be scraped
             return WebScraper.GetLink(await response.Content.ReadAsStringAsync());
+        }
+
+        private async Task<string> GetAccessToken()
+        {
+            HttpClient spotifyClient = GetSpotifyClient();
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://accounts.spotify.com/api/token");
+            request.Content = new StringContent("grant_type=client_credentials", Encoding.Default, "application/x-www-form-urlencoded");
+            var response = await spotifyClient.PostAsync(spotifyClient.BaseAddress, request.Content);
+            response.EnsureSuccessStatusCode();
+
+            var token = JsonSerializer.Deserialize<AccessToken>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions());
+            return token.access_token;
+        }
+
+        private HttpClient GetSpotifyClient()
+        {
+            //Created instance of HttpClient, because it needs special settings to get access token
+            HttpClient spotifyClient = new HttpClient();
+            byte[] clientDataByte = Encoding.UTF8.GetBytes("e73883597a9346cab465adad28569272:13a30406eac44974b05b00547daa0149");
+            var clientData = Convert.ToBase64String(clientDataByte);
+
+            spotifyClient.BaseAddress = new Uri("https://accounts.spotify.com/api/token");
+            spotifyClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", clientData);
+            return spotifyClient;
         }
     }
 }
